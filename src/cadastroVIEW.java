@@ -17,7 +17,6 @@ public class cadastroVIEW extends javax.swing.JFrame {
      */
     public cadastroVIEW() {
         initComponents();
-        cadastrarProduto();
     }
     
     private void cadastrarProduto() {
