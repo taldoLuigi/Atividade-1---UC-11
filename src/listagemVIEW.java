@@ -54,7 +54,15 @@ public class listagemVIEW extends javax.swing.JFrame {
             new String [] {
                 "ID", "Nome", "Valor", "Status"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane1.setViewportView(listaProdutos);
 
         jLabel1.setFont(new java.awt.Font("Lucida Fax", 0, 18)); // NOI18N
@@ -137,9 +145,15 @@ public class listagemVIEW extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnVenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVenderActionPerformed
-        int linhaSelecionada = listaProdutos.getSelectedRow();
-        if (linhaSelecionada >= 0) {
-            int id = (int) listaProdutos.getValueAt(linhaSelecionada, 0);
+        int id = -1;
+        String idTexto = id_produto_venda.getText().trim();
+        if (!idTexto.isEmpty()) {
+            try {
+                id = Integer.parseInt(idTexto);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "ID inválido. Digite um número.");
+                return;
+            }
 
             ProdutosDAO dao = new ProdutosDAO();
             boolean sucesso = dao.venderProduto(id);
@@ -147,6 +161,7 @@ public class listagemVIEW extends javax.swing.JFrame {
         if (sucesso) {
             JOptionPane.showMessageDialog(null, "Produto vendido com sucesso!");
             listarProdutos();
+            id_produto_venda.setText("");
         } else {
             JOptionPane.showMessageDialog(null, "Erro ao vender produto.");
         }

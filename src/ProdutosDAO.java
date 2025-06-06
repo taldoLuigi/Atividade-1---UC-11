@@ -23,7 +23,7 @@ public class ProdutosDAO {
 
         try {
             conn = new conectaDAO().conectaBD();
-            String sql = "INSERT INTO produtos (nome, valor) VALUES (?, ?)";
+            String sql = "INSERT INTO produtos (nome, valor, status) VALUES (?, ?, 'Disponível')";
             pstm = conn.prepareStatement(sql);
             pstm.setString(1, produto.getNome());
             pstm.setDouble(2, produto.getValor());
@@ -55,7 +55,7 @@ public class ProdutosDAO {
 
         try {
             conn = new conectaDAO().conectaBD();
-            String sql = "SELECT * FROM produtos";
+            String sql = "SELECT * FROM produtos WHERE status <> 'Vendido'";
             pstm = conn.prepareStatement(sql);
             rs = pstm.executeQuery();
 
@@ -64,6 +64,7 @@ public class ProdutosDAO {
                 p.setId(rs.getInt("id"));
                 p.setNome(rs.getString("nome"));
                 p.setValor(rs.getInt("valor"));
+                p.setStatus(rs.getString("status"));
                 lista.add(p);
             }
 
