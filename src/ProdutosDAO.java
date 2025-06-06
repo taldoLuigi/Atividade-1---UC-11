@@ -10,17 +10,12 @@
 
 import java.sql.PreparedStatement;
 import java.sql.Connection;
-import javax.swing.JOptionPane;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
 
 public class ProdutosDAO {
     
-    Connection conn;
-    PreparedStatement prep;
-    ResultSet resultset;
-    ArrayList<ProdutosDTO> listagem = new ArrayList<>();
     
     public boolean cadastrarProduto (ProdutosDTO produto){
         Connection conn = null;
@@ -28,7 +23,7 @@ public class ProdutosDAO {
 
         try {
             conn = new conectaDAO().conectaBD();
-            String sql = "INSERT INTO produtos (nome, valor) VALUES (?, ?)";
+            String sql = "INSERT INTO produtos (nome, valor, status) VALUES (?, ?, 'Disponível')";
             pstm = conn.prepareStatement(sql);
             pstm.setString(1, produto.getNome());
             pstm.setDouble(2, produto.getValor());
@@ -60,7 +55,7 @@ public class ProdutosDAO {
 
         try {
             conn = new conectaDAO().conectaBD();
-            String sql = "SELECT * FROM produtos";
+            String sql = "SELECT * FROM produtos WHERE status <> 'Vendido'";
             pstm = conn.prepareStatement(sql);
             rs = pstm.executeQuery();
 
@@ -69,6 +64,7 @@ public class ProdutosDAO {
                 p.setId(rs.getInt("id"));
                 p.setNome(rs.getString("nome"));
                 p.setValor(rs.getInt("valor"));
+                p.setStatus(rs.getString("status"));
                 lista.add(p);
             }
 
@@ -86,6 +82,67 @@ public class ProdutosDAO {
             }
         
             return lista;
+    }
+    
+    public boolean venderProduto(int id) {
+        Connection conn = null;
+        PreparedStatement pstm = null;
+        
+        try {
+            conn = new conectaDAO().conectaBD();
+            String sql = "UPDATE produtos SET status = 'Vendido' WHERE id = ?";
+            pstm = conn.prepareStatement(sql);
+            pstm.setInt(1, id);
+            pstm.executeUpdate();
+            
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (pstm != null) pstm.close();
+                if (conn != null) conn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
+    }
+    
+    public ArrayList<ProdutosDTO> listarProdutosVendidos() {
+        ArrayList<ProdutosDTO> lista = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+
+        try {
+            conn = new conectaDAO().conectaBD();
+            String sql = "SELECT * FROM produtos WHERE status = 'Vendido'";
+            pstm = conn.prepareStatement(sql);
+            rs = pstm.executeQuery();
+
+            while (rs.next()) {
+                ProdutosDTO p = new ProdutosDTO();
+                p.setId(rs.getInt("id"));
+                p.setNome(rs.getString("nome"));
+                p.setValor(rs.getInt("valor"));
+                lista.add(p);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (pstm != null) pstm.close();
+                if (conn != null) conn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return lista;
     }
     
     
