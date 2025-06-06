@@ -10,17 +10,12 @@
 
 import java.sql.PreparedStatement;
 import java.sql.Connection;
-import javax.swing.JOptionPane;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
 
 public class ProdutosDAO {
     
-    Connection conn;
-    PreparedStatement prep;
-    ResultSet resultset;
-    ArrayList<ProdutosDTO> listagem = new ArrayList<>();
     
     public boolean cadastrarProduto (ProdutosDTO produto){
         Connection conn = null;
@@ -86,6 +81,32 @@ public class ProdutosDAO {
             }
         
             return lista;
+    }
+    
+    public boolean venderProduto(int id) {
+        Connection conn = null;
+        PreparedStatement pstm = null;
+        
+        try {
+            conn = new conectaDAO().conectaBD();
+            String sql = "UPDATE produtos SET status = 'Vendido' WHERE id = ?";
+            pstm = conn.prepareStatement(sql);
+            pstm.setInt(1, id);
+            pstm.executeUpdate();
+            
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (pstm != null) pstm.close();
+                if (conn != null) conn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
     }
     
     
